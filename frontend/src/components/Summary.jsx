@@ -30,7 +30,6 @@ export default function Summary() {
     return <p>Loading summary...</p>
   }
 
-  // 🚪 Logout
 const logout = async () => {
   await fetch("http://localhost:8000/auth/logout", {
     method: "POST",
@@ -40,7 +39,6 @@ const logout = async () => {
   window.location.reload()
 }
 
-  // 📥 CSV download (cookie included automatically)
   const downloadCSV = async () => {
     const res = await fetch(`${API_URL}/summary/download`, {
       credentials: "include", // 🔥 REQUIRED

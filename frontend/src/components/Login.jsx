@@ -8,10 +8,8 @@ export default function Login({ onLoginSuccess }) {
 
   const handleLogin = async () => {
     try {
-      // 🔐 This sets the HttpOnly cookie
       await login(username, password)
 
-      // ✅ Tell App: login succeeded
       onLoginSuccess()
     } catch (err) {
       setError("Invalid credentials")

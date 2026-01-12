@@ -12,7 +12,6 @@ from routers.summary import router as summary_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # -------- STARTUP --------
     Base.metadata.create_all(bind=engine)
 
     db = SessionLocal()
@@ -24,16 +23,11 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    # -------- SHUTDOWN --------
-    # nothing to clean up
-
-
 app = FastAPI(
     title="Python Assessment API",
     lifespan=lifespan,
 )
 
-# 🔥🔥🔥 THIS IS THE MISSING PART 🔥🔥🔥
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],  # Vite frontend
@@ -42,6 +36,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Routers
 app.include_router(auth_router)
 app.include_router(summary_router)

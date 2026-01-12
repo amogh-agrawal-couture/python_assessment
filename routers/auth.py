@@ -9,8 +9,6 @@ from schemas import TokenResponse, MessageResponse
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-
-# ---------------- SIGNUP ----------------
 @router.post("/signup", response_model=MessageResponse)
 def signup(
     username: str,
@@ -34,7 +32,6 @@ def signup(
     return {"message": "User created successfully"}
 
 
-# ---------------- LOGIN ----------------
 @router.post("/login", response_model=TokenResponse)
 def login(
     response: Response,
@@ -51,7 +48,6 @@ def login(
 
     token = create_token(user.username)
 
-    # 🔐 Store JWT in HttpOnly cookie
     response.set_cookie(
         key="access_token",
         value=token,
@@ -66,8 +62,6 @@ def login(
         "token_type": "cookie",
     }
 
-
-# ---------------- LOGOUT (OPTIONAL) ----------------
 @router.post("/logout")
 def logout(response: Response):
     response.delete_cookie(

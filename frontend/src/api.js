@@ -1,9 +1,5 @@
 const API_URL = "http://localhost:8000"
 
-/**
- * LOGIN
- * JWT is stored automatically in HttpOnly cookie
- */
 export async function login(username, password) {
   const formData = new URLSearchParams()
   formData.append("username", username)
@@ -25,9 +21,6 @@ export async function login(username, password) {
   return res.json() // { message: "Login successful" }
 }
 
-/**
- * FETCH SUMMARY (JWT REQUIRED)
- */
 export async function fetchSummary() {
   const res = await fetch(`${API_URL}/summary`, {
     credentials: "include", // 🔥 REQUIRED
@@ -40,9 +33,6 @@ export async function fetchSummary() {
   return res.json()
 }
 
-/**
- * DOWNLOAD CSV (JWT REQUIRED)
- */
 export async function downloadSummary() {
   const res = await fetch(`${API_URL}/summary/download`, {
     credentials: "include", // 🔥 REQUIRED
@@ -55,9 +45,6 @@ export async function downloadSummary() {
   return res.blob()
 }
 
-/**
- * LOGOUT
- */
 export async function logout() {
   await fetch(`${API_URL}/auth/logout`, {
     method: "POST",

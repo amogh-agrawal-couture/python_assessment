@@ -1,4 +1,4 @@
-# routers/summary.py
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.responses import FileResponse
@@ -25,7 +25,6 @@ def get_summary(
 
     summary_df = generate_summary(df)
 
-    # Ensure correct column names
     expected_cols = {
         "category",
         "total_revenue",
@@ -48,7 +47,6 @@ def download_summary(
     current_user: str = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    # Regenerate CSV if missing
     if not os.path.exists(CSV_PATH):
         df = pd.read_sql(db.query(Product).statement, db.bind)
         summary_df = generate_summary(df)
