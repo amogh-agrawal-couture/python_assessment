@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from database import Base, engine, SessionLocal
@@ -21,15 +22,24 @@ async def lifespan(app: FastAPI):
     finally:
         db.close()
 
-    yield  # 👈 app runs here
+    yield
 
     # -------- SHUTDOWN --------
-    # (nothing to clean up for now)
+    # nothing to clean up
 
 
 app = FastAPI(
     title="Python Assessment API",
-    lifespan=lifespan
+    lifespan=lifespan,
+)
+
+# 🔥🔥🔥 THIS IS THE MISSING PART 🔥🔥🔥
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Vite frontend
+    allow_credentials=True,                   # REQUIRED FOR COOKIES
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Routers

@@ -5,20 +5,15 @@ const API_URL = "http://localhost:8000"
 export default function Summary() {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
-  const token = localStorage.getItem("token")
 
-  // 🔐 Fetch summary with JWT
   useEffect(() => {
     const fetchSummary = async () => {
       const res = await fetch(`${API_URL}/summary`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: "include", // 🔥 SEND COOKIE
       })
 
-      // 🔴 Token invalid / expired
       if (res.status === 401) {
-        localStorage.removeItem("token")
+        alert("Session expired. Please login again.")
         window.location.reload()
         return
       }
@@ -29,29 +24,30 @@ export default function Summary() {
     }
 
     fetchSummary()
-  }, [token])
+  }, [])
 
-  // ⏳ Loading state
   if (loading) {
     return <p>Loading summary...</p>
   }
 
   // 🚪 Logout
-  const logout = () => {
-    localStorage.removeItem("token")
-    window.location.reload()
-  }
+const logout = async () => {
+  await fetch("http://localhost:8000/auth/logout", {
+    method: "POST",
+    credentials: "include", // 🔥 REQUIRED
+  })
 
-  // 📥 Secure CSV download (JWT included)
+  window.location.reload()
+}
+
+  // 📥 CSV download (cookie included automatically)
   const downloadCSV = async () => {
     const res = await fetch(`${API_URL}/summary/download`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: "include", // 🔥 REQUIRED
     })
 
     if (!res.ok) {
-      alert("Unauthorized or session expired")
+      alert("Unauthorized")
       return
     }
 
@@ -61,10 +57,8 @@ export default function Summary() {
     const a = document.createElement("a")
     a.href = url
     a.download = "summary.csv"
-    document.body.appendChild(a)
     a.click()
 
-    document.body.removeChild(a)
     window.URL.revokeObjectURL(url)
   }
 

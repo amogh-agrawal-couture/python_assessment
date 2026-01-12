@@ -1,36 +1,43 @@
 import { useState } from "react"
 import { login } from "../api"
 
-export default function Login({ setToken }) {
+export default function Login({ onLoginSuccess }) {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
 
   const handleLogin = async () => {
-    const data = await login(username, password)
+    try {
+      // 🔐 This sets the HttpOnly cookie
+      await login(username, password)
 
-    if (data.access_token) {
-      localStorage.setItem("token", data.access_token)
-      setToken(data.access_token)
-    } else {
-      alert("Invalid credentials")
+      // ✅ Tell App: login succeeded
+      onLoginSuccess()
+    } catch (err) {
+      setError("Invalid credentials")
     }
   }
 
   return (
     <>
       <h2>Login</h2>
+
       <input
         placeholder="Username"
         value={username}
         onChange={e => setUsername(e.target.value)}
       />
+
       <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={e => setPassword(e.target.value)}
       />
+
       <button onClick={handleLogin}>Login</button>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </>
   )
 }
