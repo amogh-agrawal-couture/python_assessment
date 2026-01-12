@@ -7,19 +7,18 @@ from database import get_db
 from models import Product
 from analysis import generate_summary
 from auth import get_current_user
+from schemas import SummaryRow
 
-router = APIRouter(
-    prefix="/summary",
-    tags=["Summary"]
-)
+router = APIRouter(prefix="/summary", tags=["Summary"])
 
 
-@router.get("/")
+@router.get("/", response_model=list[SummaryRow])
 def get_summary(
-    user: str = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
     df = pd.read_sql(db.query(Product).statement, db.bind)
+
     summary_df = generate_summary(df)
     summary_df.to_csv("summary.csv", index=False)
 
@@ -28,10 +27,10 @@ def get_summary(
 
 @router.get("/download")
 def download_summary(
-    user: str = Depends(get_current_user)
+    current_user=Depends(get_current_user),
 ):
     return FileResponse(
         "summary.csv",
         media_type="text/csv",
-        filename="summary.csv"
+        filename="summary.csv",
     )
