@@ -1,5 +1,6 @@
-# main.py
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from database import Base, engine, SessionLocal
 from models import Product
 from data_loader import load_csv
@@ -9,8 +10,19 @@ from routers.summary import router as summary_router
 
 app = FastAPI(title="Python Assessment API")
 
-Base.metadata.create_all(engine)
+# ✅ CORS (REQUIRED for React)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+# ✅ Create tables
+Base.metadata.create_all(bind=engine)
+
+# ✅ Load CSV on startup
 @app.on_event("startup")
 def startup():
     db = SessionLocal()
@@ -18,6 +30,6 @@ def startup():
         load_csv(db)
     db.close()
 
-# 🚨 THIS is what makes signup appear
+# ✅ Routers
 app.include_router(auth_router)
 app.include_router(summary_router)
