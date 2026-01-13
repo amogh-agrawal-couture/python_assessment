@@ -14,4 +14,6 @@ def generate_summary(df: pd.DataFrame) -> pd.DataFrame:
             "top_product_quantity_sold": int(top["quantity_sold"])
         })
 
+        #dummmy
+
     return pd.DataFrame(rows)
