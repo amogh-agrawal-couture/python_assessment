@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.responses import FileResponse
@@ -14,44 +13,32 @@ from schemas import SummaryRow
 router = APIRouter(prefix="/summary", tags=["Summary"], dependencies=[Depends(get_current_user)])
 
 CSV_PATH = "summary.csv"
+EXPECTED_COLS = {"category", "total_revenue", "top_product", "top_product_quantity_sold"}
 
+def _ensure_summary(db: Session) -> pd.DataFrame:
+    if os.path.exists(CSV_PATH):
+        try:
+            df = pd.read_csv(CSV_PATH)
+            if not df.empty and EXPECTED_COLS.issubset(df.columns):
+                return df
+        except Exception:
+            pass
 
-@router.get("/", response_model=list[SummaryRow])
-def get_summary(
-    db: Session = Depends(get_db),
-):
-    df = pd.read_sql(db.query(Product).statement, db.bind)
+    products_df = pd.read_sql(db.query(Product).statement, db.bind)
+    summary_df = generate_summary(products_df)
 
-    summary_df = generate_summary(df)
-
-    expected_cols = {
-        "category",
-        "total_revenue",
-        "top_product",
-        "top_product_quantity_sold",
-    }
-    if not expected_cols.issubset(summary_df.columns):
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Summary dataframe columns mismatch",
-        )
+    if not EXPECTED_COLS.issubset(summary_df.columns):
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Invalid summary columns")
 
     summary_df.to_csv(CSV_PATH, index=False)
+    return summary_df
 
-    return summary_df.to_dict(orient="records")
+@router.get("/", response_model=list[SummaryRow])
+def get_summary(db: Session = Depends(get_db)):
+    return _ensure_summary(db).to_dict(orient="records")
 
 
 @router.get("/download")
-def download_summary(
-    db: Session = Depends(get_db),
-):
-    if not os.path.exists(CSV_PATH):
-        df = pd.read_sql(db.query(Product).statement, db.bind)
-        summary_df = generate_summary(df)
-        summary_df.to_csv(CSV_PATH, index=False)
-
-    return FileResponse(
-        CSV_PATH,
-        media_type="text/csv",
-        filename="summary.csv",
-    )
+def download_summary(db: Session = Depends(get_db)):
+    _ensure_summary(db)
+    return FileResponse(CSV_PATH, media_type="text/csv", filename="summary.csv")
