@@ -1,9 +1,10 @@
-from datetime import datetime, timedelta
+import os
+from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from fastapi import Request, HTTPException, status
 from passlib.context import CryptContext
 
-SECRET_KEY = "super-secret-key"
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 2
 
@@ -21,7 +22,7 @@ def verify_password(password: str, hashed: str) -> bool:
 def create_token(username: str) -> str:
     payload = {
         "sub": username,
-        "exp": datetime.utcnow() + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS),
+        "exp": datetime.now(timezone.utc) + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS),
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
