@@ -21,9 +21,9 @@ def clean_products_csv(path="products_raw.csv") -> pd.DataFrame:
     # Fill missing numeric values
     df["price"].fillna(df["price"].median(), inplace=True)
     df["quantity_sold"].fillna(df["quantity_sold"].median(), inplace=True)
-    df["rating"] = df.groupby("category")["rating"].transform(lambda x: x.fillna(x.mean()))
+    df["rating"] = df["rating"].fillna(df.groupby("category")["rating"].transform("mean"))
     df["review_count"].fillna(0, inplace=True)
-    df["product_id"].fillna(method="ffill", inplace=True)
+    df["product_id"].ffill(inplace=True)
 
     # Drop any remaining NaNs
     df = df.dropna()
