@@ -5,10 +5,10 @@ import pandas as pd
 import os
 from starlette import status
 from database import get_db
-from models import Product
+from models.models import Product
 from analysis import generate_summary
-from auth import get_current_user
-from schemas import SummaryRow
+from utils.auth import get_current_user
+from schemas.schemas import SummaryRow
 
 router = APIRouter(prefix="/summary", tags=["Summary"], dependencies=[Depends(get_current_user)])
 

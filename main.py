@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 from database import Base, engine, SessionLocal
 from models import Product
-from data_loader import load_csv
+from utils.data_loader import load_csv
 
 from routers.auth import router as auth_router
 from routers.summary import router as summary_router

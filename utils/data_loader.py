@@ -2,7 +2,7 @@
 
 import pandas as pd
 from sqlalchemy.orm import Session
-from models import Product  # your SQLAlchemy model
+from models.models import Product  # your SQLAlchemy model
 
 
 def clean_products_csv(path="products_raw.csv") -> pd.DataFrame:
