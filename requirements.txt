@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+pandas
+passlib[bcrypt]
+python-jose
+faker
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+python-multipart
+pydantic
+starlette
